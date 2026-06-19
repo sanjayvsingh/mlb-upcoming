@@ -8,7 +8,7 @@ MLB Tracker is a real-time baseball game discovery platform that helps fans watc
 
 | Name | Role | Notes |
 |------|------|-------|
-| Sanja Singh | Product Owner & Engineer | Owns master Google Sheet, drives feature prioritization |
+| Sanjay Singh | Product Owner & Engineer | Owns master Google Sheet, drives feature prioritization |
 | Backend Proxy Layer | Dependency | PHP scripts for Gemini, MLB Stats, broadcaster scraping |
 | MLB Stats API | External | Free schedule/standings; no rate limit concerns |
 | Google Gemini API | External | AI recommendations; fallback chain for 429/503 errors |
@@ -265,6 +265,6 @@ Only tool combining: unseen team tracking + AI recommendations + Canadian broadc
 
 ---
 
-**Document Owner:** Sanja Singh  
+**Document Owner:** Sanjay Singh  
 **Last Updated:** June 18, 2026  
 **Status:** Ready for engineering review
