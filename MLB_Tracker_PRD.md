@@ -4,17 +4,7 @@
 
 MLB Tracker is a real-time baseball game discovery platform that helps fans watch every MLB team at least once per season. The app fetches live data from the MLB Stats API, highlights games featuring unseen teams, leverages AI recommendations to surface compelling matchups, and integrates with Canadian broadcasters and alternative baseball leagues. Built with vanilla frontend and PHP backend proxies.
 
-## 2. Contacts
-
-| Name | Role | Notes |
-|------|------|-------|
-| Sanjay Singh | Product Owner & Engineer | Owns master Google Sheet, drives feature prioritization |
-| Backend Proxy Layer | Dependency | PHP scripts for Gemini, MLB Stats, broadcaster scraping |
-| MLB Stats API | External | Free schedule/standings; no rate limit concerns |
-| Google Gemini API | External | AI recommendations; fallback chain for 429/503 errors |
-| ipinfo.io | External | IP geo-detection for Canadian gating; retry on timeout |
-
-## 3. Background
+## 2. Background
 
 **Context:** User manually tracked all 30 MLB teams via Google Sheet in 2024, struggled to identify unseen team games.
 
@@ -26,7 +16,7 @@ MLB Tracker is a real-time baseball game discovery platform that helps fans watc
 - Vanilla JS stack reduces deployment overhead
 - Working prototype proves concept (96 commits)
 
-## 4. Objective
+## 3. Objective
 
 ### Goals
 1. Reduce unseen team discovery from hours/week to minutes
@@ -46,7 +36,7 @@ MLB Tracker is a real-time baseball game discovery platform that helps fans watc
 - **KR4:** 90% feature availability (99.9% uptime)
 - **KR5:** <2s page load, <500ms API response
 
-## 5. Market Segments
+## 4. Market Segments
 
 ### Segment 1: Season Goal Completionists (Primary)
 **Who:** Fans pursuing "see all 30 teams in one season"  
@@ -69,7 +59,7 @@ MLB Tracker is a real-time baseball game discovery platform that helps fans watc
 **Size:** 10K (geo-specific)  
 **Behavior:** Check weekly during season
 
-## 6. Value Propositions
+## 5. Value Propositions
 
 ### Value Curve: Before vs. After
 | Factor | Before | After | Importance |
@@ -92,7 +82,7 @@ Only tool combining: unseen team tracking + AI recommendations + Canadian broadc
 | Electric starters | ✅ | ❌ | ❌ | ❌ |
 | URL sharing | ✅ | ❌ | ❌ | ❌ |
 
-## 7. Solution
+## 6. Solution
 
 ### 7.1 UX Overview
 - **Header:** Logo, title, Settings gear icon
@@ -215,7 +205,7 @@ Only tool combining: unseen team tracking + AI recommendations + Canadian broadc
 | Gemini $0.075/call sustainable at 100K DAU | Financial modeling | Low |
 | Users value 1-click sharing | UX testing | Medium |
 
-## 8. Release
+## 7. Release
 
 ### Phase 1: Stabilization (June-July 2026)
 - Mobile responsive refinements
@@ -265,6 +255,5 @@ Only tool combining: unseen team tracking + AI recommendations + Canadian broadc
 
 ---
 
-**Document Owner:** Sanjay Singh  
 **Last Updated:** June 18, 2026  
 **Status:** Ready for engineering review
