@@ -329,8 +329,21 @@ async function fetchSavedTeams() {
                 await applySharedElectricStarters(sharedIds);
             }
         }
+        // Apply excluded broadcasters from share link
+        const excludeBroadcastersParam = urlParams.get('exclude_broadcasters');
+        if (excludeBroadcastersParam) {
+            const excluded = excludeBroadcastersParam.split(',').map(s => s.trim());
+            const prefs = loadBroadcasterPrefs();
+            excluded.forEach(b => {
+                if (BROADCASTERS.includes(b)) {
+                    prefs[b] = false;
+                }
+            });
+            saveBroadcasterPrefs(prefs);
+        }
         urlParams.delete('seen');
         urlParams.delete('electric');
+        urlParams.delete('exclude_broadcasters');
         const newUrl = window.location.origin + window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
         window.history.replaceState({}, document.title, newUrl);
 
@@ -1491,6 +1504,11 @@ function buildShareUrl() {
     const customIds = loadCustomElectricStarters().map(p => p.id);
     if (customIds.length > 0) {
         url += `&electric=${customIds.join(',')}`;
+    }
+    const broadcasterPrefs = loadBroadcasterPrefs();
+    const disabledBroadcasters = BROADCASTERS.filter(b => broadcasterPrefs[b] === false);
+    if (disabledBroadcasters.length > 0) {
+        url += `&exclude_broadcasters=${disabledBroadcasters.join(',')}`;
     }
     return url;
 }
