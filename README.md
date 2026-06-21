@@ -18,7 +18,8 @@ While built for personal use, it's also a great way for any fan to see what inte
 - **Gemini AI Recommendations**: Uses AI to automatically identify and showcase 5 compelling games across the 3-day window.
 - **Showcase Toast Notifications**: Visual confirmation when AI recommendations load or encounter errors.
 - **Dynamic Electric Starters**: Automatically calculates the top 10 "electric" starting pitchers each day using a K/9 and K/BB percentile formula. Pitchers with at least 3 game starts qualify. Results are matched to probable starters by MLB player ID (not name), so accented names and common surnames match correctly.
-- **Custom Starters**: A Settings panel (gear icon) lets you add your own pitchers to follow alongside the formula top 10. Custom starters are saved in browser storage and matched by MLB player ID via a searchable roster. The Share button (inside Settings) generates a link that includes your custom starters by player ID — when a friend opens the link, those pitchers are automatically added to their local browser storage.
+- **Custom Starters**: A Settings panel (gear icon) lets you add your own pitchers to follow alongside the formula top 10. Custom starters are saved in browser storage and matched by MLB player ID via a searchable roster.
+- **Broadcaster Preferences**: Toggle featured broadcasters on/off in Settings (Special Events, Banana Ball, MLB Network, Sportsnet, TSN). Disabled broadcasters' badges are hidden from game cards and excluded from the Featured Broadcasts filter. Preferences are included in share links.
 - **Banana Ball Games**: Savannah Bananas games broadcast on YouTube are injected into the 3-day schedule as separate cards, marked with a banana icon. Times are converted to Eastern from local venue timezone.
 - **Metrics Shelf**: Visual representation of your season progress.
 - **Material Icons**: Clean, consistent UI using Material Design iconography.
@@ -62,6 +63,7 @@ You can customize the application state using the following parameters:
 | `u` | `s` | **Owner Mode**: Initializes your local device as the "Owner" to sync with the master Google Sheet. |
 | `seen` | `CSV` (e.g., `ARI,ATL`) | **Share Mode**: Overrides local seen status with a specific list of team abbreviations (ideal for sharing with friends). |
 | `electric` | `CSV` of player IDs | **Shared Custom Starters**: Passed alongside `seen` — resolves player IDs against the active pitcher roster and adds them to the recipient's custom starters in local storage. |
+| `exclude_broadcasters` | `CSV` (e.g., `MLB Network,Sportsnet`) | **Shared Broadcaster Preferences**: Passed with share links to apply the sharer's disabled broadcasters to the recipient. Recipient's disabled broadcasters are automatically updated when opening the link. |
 | `debugDate`| `YYYY-MM-DD` | **Debug Mode**: Mocks the "current" date to view historical or future schedules. Also switches to a lighter Gemini model to conserve API quota. |
 
 ## 🛠️ Tech Stack
