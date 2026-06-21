@@ -23,7 +23,7 @@ let electricScoreMap    = new Map(); // id -> score for all GS>=3 pitchers
 let allPitcherRoster    = null;      // [{id, name, team}] loaded lazily for search
 
 // Broadcaster preferences (which featured broadcasters to show)
-const BROADCASTERS = ['Banana Ball', 'MLB Network', 'Sportsnet', 'TSN'];
+const BROADCASTERS = ['Special Events', 'Banana Ball', 'MLB Network', 'Sportsnet', 'TSN'];
 function loadBroadcasterPrefs() {
     const stored = localStorage.getItem(BROADCASTER_PREFS_KEY);
     if (stored) return JSON.parse(stored);
@@ -858,7 +858,12 @@ function renderGames() {
             }).join(', ');
             const milestoneTooltip = g.milestoneInfo.map(m => m.description).join(' • ');
             const broadcasterPrefs = loadBroadcasterPrefs();
-            const filteredNetworks = g.featuredNetworks.filter(n => broadcasterPrefs[n] !== false);
+            const specialEventLabels = new Set(FEATURED_EVENTS.map(e => e.label));
+            const filteredNetworks = g.featuredNetworks.filter(n => {
+                const isSpecialEvent = specialEventLabels.has(n);
+                if (isSpecialEvent) return broadcasterPrefs['Special Events'] !== false;
+                return broadcasterPrefs[n] !== false;
+            });
             badgesHtml = [
                 `<div class="badge fun-badge" title="${escapeHTML(funTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">diamond</span>${escapeHTML(g.funScore)}</div>`,
                 g.isShowcase ? `<div class="badge showcase-badge" title="${escapeHTML(g.showcaseReason)}"><span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">auto_awesome</span>SHOWCASE</div>` : '',
@@ -1612,15 +1617,16 @@ function renderElectricModal() {
         <div class="em-broadcaster-section">
             <div class="settings-section-title">
                 <span class="material-icons" style="font-size:16px;color:#8b5cf6;vertical-align:middle;margin-right:5px">tv</span>
-                Featured Broadcasters
+                Featured Broadcasts
             </div>
             <div class="em-broadcaster-list">
                 ${BROADCASTERS.map(b => {
                     const prefs = loadBroadcasterPrefs();
                     const checked = prefs[b] ? 'checked' : '';
+                    const displayLabel = b === 'Special Events' ? 'Special Events (Field of Dreams, etc.)' : b;
                     return `<label class="em-broadcaster-label">
                         <input type="checkbox" class="em-broadcaster-checkbox" data-broadcaster="${b}" ${checked}>
-                        <span>${b}</span>
+                        <span>${displayLabel}</span>
                     </label>`;
                 }).join('')}
             </div>
