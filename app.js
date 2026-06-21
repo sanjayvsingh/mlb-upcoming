@@ -807,11 +807,24 @@ function renderGames() {
     const oneHourAgo = new Date(getToday() - 60 * 60 * 1000);
     
     // Apply filters
+    const broadcasterPrefs = loadBroadcasterPrefs();
+    const specialEventLabels = new Set(FEATURED_EVENTS.map(e => e.label));
+
     const filtered = list.filter(g => {
         if (g.date < oneHourAgo) return false;
         if (g.isBananaBall) return !filters.funGames && !filters.bothUnseen && !filters.featured && !filters.electric && !filters.showcase;
         if (filters.bothUnseen && !g.bothUnseen) return false;
-        if (filters.featured && g.featuredNetworks.length === 0) return false;
+
+        // For featured filter, check if any broadcasters pass the preference filter
+        if (filters.featured) {
+            const hasEnabledBroadcasters = g.featuredNetworks.some(n => {
+                const isSpecialEvent = specialEventLabels.has(n);
+                if (isSpecialEvent) return broadcasterPrefs['Special Events'] !== false;
+                return broadcasterPrefs[n] !== false;
+            });
+            if (!hasEnabledBroadcasters) return false;
+        }
+
         if (filters.electric && !g.anyElectric) return false;
         if (filters.funGames && !g.isHighFun) return false;
         if (filters.showcase && !g.isShowcase) return false;
