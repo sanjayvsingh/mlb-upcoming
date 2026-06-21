@@ -14,12 +14,25 @@ const MLB_OFFICIAL_NAMES = new Set([
 ]);
 
 const CUSTOM_ELECTRIC_KEY = 'mlb_custom_electric';
+const BROADCASTER_PREFS_KEY = 'mlb_broadcaster_prefs';
 
 // Populated from electric.php (top 10 by formula) + user's custom starters from localStorage
 let electricStarterIds  = new Set(); // MLB player IDs (numbers)
 let electricStarterData = [];        // [{id, name, team, k9, kbb, score}] for modal display
 let electricScoreMap    = new Map(); // id -> score for all GS>=3 pitchers
 let allPitcherRoster    = null;      // [{id, name, team}] loaded lazily for search
+
+// Broadcaster preferences (which featured broadcasters to show)
+const BROADCASTERS = ['Banana Ball', 'MLB Network', 'Sportsnet', 'TSN'];
+function loadBroadcasterPrefs() {
+    const stored = localStorage.getItem(BROADCASTER_PREFS_KEY);
+    if (stored) return JSON.parse(stored);
+    // Default: all enabled
+    return Object.fromEntries(BROADCASTERS.map(b => [b, true]));
+}
+function saveBroadcasterPrefs(prefs) {
+    localStorage.setItem(BROADCASTER_PREFS_KEY, JSON.stringify(prefs));
+}
 
 const TEAM_ABBR = {
     "Orioles": "BAL", "Red Sox": "BOS", "Yankees": "NYY", "Rays": "TBR", "Blue Jays": "TOR",
@@ -844,6 +857,8 @@ function renderGames() {
                 return `${h.name} (${allStats})`;
             }).join(', ');
             const milestoneTooltip = g.milestoneInfo.map(m => m.description).join(' • ');
+            const broadcasterPrefs = loadBroadcasterPrefs();
+            const filteredNetworks = g.featuredNetworks.filter(n => broadcasterPrefs[n] !== false);
             badgesHtml = [
                 `<div class="badge fun-badge" title="${escapeHTML(funTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">diamond</span>${escapeHTML(g.funScore)}</div>`,
                 g.isShowcase ? `<div class="badge showcase-badge" title="${escapeHTML(g.showcaseReason)}"><span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">auto_awesome</span>SHOWCASE</div>` : '',
@@ -851,7 +866,7 @@ function renderGames() {
                 g.anyElectric ? `<div class="badge electric-badge mobile-only"><span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">bolt</span>ELECTRIC SP</div>` : '',
                 g.hotHitterInfo.length > 0 ? `<div class="badge hot-hitter-badge" title="${escapeHTML(hotHitterTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">local_fire_department</span>HOT BATS</div>` : '',
                 g.milestoneInfo.length > 0 ? `<div class="badge milestone-badge" title="${escapeHTML(milestoneTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">emoji_events</span>MILESTONE</div>` : '',
-                ...g.featuredNetworks.map(n => `<div class="badge network-badge">${escapeHTML(n)}</div>`)
+                ...filteredNetworks.map(n => `<div class="badge network-badge">${escapeHTML(n)}</div>`)
             ].join('');
             pitcherSplitHtml = `
                     <div class="pitcher-split">
@@ -1594,6 +1609,22 @@ function renderElectricModal() {
                 <tbody>${hotBatsRows}</tbody>
             </table>
         </div>
+        <div class="em-broadcaster-section">
+            <div class="settings-section-title">
+                <span class="material-icons" style="font-size:16px;color:#8b5cf6;vertical-align:middle;margin-right:5px">tv</span>
+                Featured Broadcasters
+            </div>
+            <div class="em-broadcaster-list">
+                ${BROADCASTERS.map(b => {
+                    const prefs = loadBroadcasterPrefs();
+                    const checked = prefs[b] ? 'checked' : '';
+                    return `<label class="em-broadcaster-label">
+                        <input type="checkbox" class="em-broadcaster-checkbox" data-broadcaster="${b}" ${checked}>
+                        <span>${b}</span>
+                    </label>`;
+                }).join('')}
+            </div>
+        </div>
         <div class="em-sharing-section">
             <div class="settings-section-title" style="margin-bottom:0.5rem">
                 <span class="material-icons" style="font-size:16px;color:var(--text-muted);vertical-align:middle;margin-right:5px">ios_share</span>
@@ -1611,6 +1642,15 @@ function renderElectricModal() {
 
     body.querySelectorAll('.custom-chip-remove').forEach(btn => {
         btn.addEventListener('click', () => removeCustomStarter(Number(btn.dataset.id)));
+    });
+
+    body.querySelectorAll('.em-broadcaster-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const prefs = loadBroadcasterPrefs();
+            prefs[e.target.dataset.broadcaster] = e.target.checked;
+            saveBroadcasterPrefs(prefs);
+            renderGames();
+        });
     });
 
     const searchInput = body.querySelector('#pitcher-search-input');
