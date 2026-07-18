@@ -24,6 +24,7 @@ While built for personal use, it's also a great way for any fan to see what inte
 - **Metrics Shelf**: Visual representation of your season progress.
 - **Material Icons**: Clean, consistent UI using Material Design iconography.
 - **Mobile Responsive**: Designed to look great on any device.
+- **Welcome Popup**: A first-time user onboarding modal that explains the app's purpose, how to mark teams as seen via double-clicking in the standings, and how to access customization options through the settings menu. Dismissed on first interaction and not shown again (tracked via `localStorage`).
 
 ## 📡 API Usage
 

@@ -124,6 +124,7 @@ const dom = {
 
 async function init() {
     setupListeners();
+    checkWelcomePopup();
     await loadEverything();
 }
 
@@ -265,8 +266,19 @@ function setupListeners() {
     document.getElementById('electric-modal')?.addEventListener('click', function(e) {
         if (e.target === this) closeElectricModal();
     });
+
+    // Welcome modal listeners
+    document.getElementById('welcome-modal-close')?.addEventListener('click', closeWelcomeModal);
+    document.getElementById('welcome-get-started-btn')?.addEventListener('click', closeWelcomeModal);
+    document.getElementById('welcome-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeWelcomeModal();
+    });
+
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeElectricModal();
+        if (e.key === 'Escape') {
+            closeElectricModal();
+            closeWelcomeModal();
+        }
     });
 
     // Event delegation for toggling team seen state
@@ -1547,8 +1559,38 @@ function closeElectricModal() {
     const modal = document.getElementById('electric-modal');
     if (!modal) return;
     modal.style.display = 'none';
-    document.body.style.overflow = '';
+    const welcomeModal = document.getElementById('welcome-modal');
+    if (!welcomeModal || welcomeModal.style.display !== 'flex') {
+        document.body.style.overflow = '';
+    }
     hidePitcherDropdown();
+}
+
+// ── Welcome Modal ──────────────────────────────────────────────────────────────
+
+function checkWelcomePopup() {
+    const welcomeSeen = localStorage.getItem('mlbTrackerWelcomeSeen');
+    if (!welcomeSeen) {
+        openWelcomeModal();
+    }
+}
+
+function openWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    const settingsModal = document.getElementById('electric-modal');
+    if (!settingsModal || settingsModal.style.display !== 'flex') {
+        document.body.style.overflow = '';
+    }
+    localStorage.setItem('mlbTrackerWelcomeSeen', 'true');
 }
 
 function renderElectricModal() {

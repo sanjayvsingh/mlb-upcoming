@@ -155,6 +155,45 @@ $csrf_token = csrf_generate();
         </div>
     </div>
 
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title">
+        <div class="modal-box welcome-modal-box" role="document">
+            <div class="modal-header">
+                <span class="material-icons modal-header-icon" style="color: var(--accent-green)">sports_baseball</span>
+                <span id="welcome-modal-title" class="modal-title">Welcome to Baseball Games to Watch</span>
+                <button id="welcome-modal-close" class="modal-close-btn" aria-label="Close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body welcome-modal-body">
+                <div class="welcome-illustration">
+                    <span class="material-icons welcome-hero-icon">sports_baseball</span>
+                </div>
+                <h2>Track and watch all 30 MLB teams</h2>
+                <p>This app helps recommend games to watch over the next three days with a goal of seeing all teams play in the season.</p>
+                
+                <div class="welcome-instruction-card">
+                    <div class="welcome-instruction-item">
+                        <span class="welcome-instruction-num">1.</span>
+                        <div class="instruction-text">
+                            Mark a team as seen by double-clicking on their name under <strong>Standings</strong>.
+                        </div>
+                    </div>
+                    <div class="welcome-instruction-item">
+                        <span class="welcome-instruction-num">2.</span>
+                        <div class="instruction-text">
+                            Customize options under the <span class="material-icons welcome-gear-icon">settings</span> menu.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-action-area">
+                    <button id="welcome-get-started-btn" class="welcome-btn-primary">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>window.CSRF_TOKEN = '<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>';</script>
     <script src="featured-events.js"></script>
     <script src="app.js"></script>
