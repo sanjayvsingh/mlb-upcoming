@@ -1,4 +1,4 @@
-$port = 8000
+$port = 8002
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$port/")
 $listener.Prefixes.Add("http://localhost:$port/")
@@ -20,7 +20,7 @@ try {
             
             if ($context.Request.HttpMethod -eq 'OPTIONS') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
@@ -32,7 +32,7 @@ try {
 
             if ($localPath -eq 'gemini.php' -and $context.Request.HttpMethod -eq 'POST') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 
@@ -242,7 +242,7 @@ try {
             # Sportsnet scraper endpoint
             if ($localPath -eq 'sportsnet.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 
@@ -373,7 +373,7 @@ try {
             # MLB Network scraper endpoint
             if ($localPath -eq 'mlbnetwork.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 
@@ -467,7 +467,7 @@ try {
             # Electric starters endpoint
             if ($localPath -eq 'electric.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"
@@ -567,7 +567,7 @@ try {
             # TSN MLB schedule endpoint
             if ($localPath -eq 'tsn.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"
@@ -656,7 +656,7 @@ try {
             # Bananas (Savannah Bananas / Banana Ball) YouTube schedule endpoint
             if ($localPath -eq 'bananas.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"
@@ -791,7 +791,7 @@ try {
             # Pitcher roster endpoint (for Electric Starters modal autocomplete)
             if ($localPath -eq 'pitchers.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"
@@ -853,7 +853,7 @@ try {
             # IP geolocation endpoint
             if ($localPath -eq 'ipinfo.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"
@@ -902,7 +902,7 @@ try {
             # Unseen teams sheet endpoint
             if ($localPath -eq 'sheet.php' -and $context.Request.HttpMethod -eq 'GET') {
                 $origin = $context.Request.Headers["Origin"]
-                if ($origin -match "http://localhost:8000|http://127.0.0.1:8000|https://mlb.sanvash.com") {
+                if ($origin -match "http://localhost:8002|http://127.0.0.1:8002|https://mlb.sanvash.com") {
                     $response.AddHeader("Access-Control-Allow-Origin", $origin)
                 }
                 $response.ContentType = "application/json"

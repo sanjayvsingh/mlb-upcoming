@@ -37,7 +37,7 @@ body { background-color: var(--bg-dark); color: var(--text-primary); min-height:
 
 /* METRICS SHELF */
 .metrics-shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
-.metric-card { background: var(--bg-panel); border: 1px solid var(--border-main); border-radius: var(--card-radius); padding: 1rem; display: flex; align-items: center; gap: 16px; }
+.metric-card { background: var(--bg-panel); border: 1px solid var(--border-main); border-radius: var(--card-radius); padding: 1rem; display: flex; align-items: center; gap: 16px; position: relative; }
 .metric-icon-circle { width: 48px; height: 48px; border-radius: 50%; background: conic-gradient(var(--accent-green) calc(var(--progress, 0) * 1%), var(--border-main) 0); display: flex; justify-content: center; align-items: center; font-weight: 700; color: var(--text-muted); position: relative; }
 .metric-icon-circle::before { content: ''; position: absolute; inset: 3px; background: var(--bg-panel); border-radius: 50%; z-index: 1; }
 #metric-percent { position: relative; z-index: 2; }
@@ -51,6 +51,50 @@ body { background-color: var(--bg-dark); color: var(--text-primary); min-height:
 .metric-card.highlight-green .metric-value { color: var(--accent-green); }
 .metric-card.highlight-gold { border-top: 3px solid var(--accent-gold); }
 .metric-card.highlight-gold .metric-value { color: var(--accent-gold); }
+
+.upcoming-badge {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    border: 2px solid var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.upcoming-badge .material-icons { font-size: 15px !important; color: var(--bg-dark); }
+
+/* Tap-friendly tooltip bubble — supplements title="" on touch devices,
+   which don't otherwise surface title on tap. Desktop keeps native hover. */
+.tap-tooltip-bubble {
+    position: fixed;
+    z-index: 3000;
+    background: var(--bg-card);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    max-width: 240px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    pointer-events: none;
+    white-space: pre-line;
+}
+.tap-tooltip-bubble::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+}
+.tap-tooltip-bubble.arrow-bottom::after { top: 100%; border-top-color: var(--border-main); }
+.tap-tooltip-bubble.arrow-top::after { bottom: 100%; border-bottom-color: var(--border-main); }
 
 /* TABS */
 .tabs-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }

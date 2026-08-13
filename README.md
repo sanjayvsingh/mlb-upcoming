@@ -14,7 +14,9 @@ While built for personal use, it's also a great way for any fan to see what inte
 
 - **Real-time Game Tracking**: Fetches live data from the MLB Stats API.
 - **Unseen Team Highlights**: Automatically identifies matchups with teams you haven't watched yet.
-- **Priority Filtering**: Filter for "Top Priority" games where both teams are unseen.
+- **Priority Filtering**: Filter for "Both Teams Unseen" games — the top-priority double-value matchups. Once 80% of teams have been seen (any date), fully-unseen matchups become scarce, so the filter and its metric card automatically broaden to "Unseen Teams" (any game with at least one unseen team) instead.
+- **Upcoming Matchup Look-Ahead**: Once the filter above has broadened to "Unseen Teams," a small badge appears on that metric card pointing to the next upcoming both-teams-unseen matchup later in the season (hover/tap for the series and dates), found by searching the remaining MLB schedule.
+- **Tap-Friendly Tooltips**: On touch devices, tapping any element with a tooltip shows it in a positioned bubble instead of relying on unavailable hover states; desktop hover behavior is unchanged.
 - **Gemini AI Recommendations**: Uses AI to automatically identify and showcase 5 compelling games across the 3-day window.
 - **Showcase Toast Notifications**: Visual confirmation when AI recommendations load or encounter errors.
 - **Dynamic Electric Starters**: Automatically calculates the top 10 "electric" starting pitchers each day using a K/9 and K/BB percentile formula. Pitchers with at least 3 game starts qualify. Results are matched to probable starters by MLB player ID (not name), so accented names and common surnames match correctly.

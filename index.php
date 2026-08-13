@@ -54,9 +54,9 @@ $csrf_token = csrf_generate();
                     </div>
                     <div class="metric-card highlight-green">
                         <div class="metric-info">
-                            <span class="metric-label"><span class="material-icons unseen-icon">visibility</span> Both Teams Unseen</span>
+                            <span class="metric-label"><span class="material-icons unseen-icon">visibility</span> <span id="metric-both-label">Both Teams Unseen</span></span>
                             <div class="metric-value" id="metric-both">0</div>
-                            <span class="metric-sublabel">top priority matchups</span>
+                            <span class="metric-sublabel" id="metric-both-sublabel">top priority matchups</span>
                         </div>
                     </div>
                     <div class="metric-card highlight-gold">
@@ -94,7 +94,7 @@ $csrf_token = csrf_generate();
                         <span class="material-icons" style="color: var(--accent-blue); font-size: 18px; vertical-align: middle;">diamond</span> <span class="filter-text">Fun Games</span>
                     </button>
                     <button class="filter-btn" id="filter-unseen">
-                        <span class="material-icons unseen-icon">visibility</span> <span class="filter-text">Both Teams Unseen</span>
+                        <span class="material-icons unseen-icon">visibility</span> <span class="filter-text" id="filter-unseen-text">Both Teams Unseen</span>
                     </button>
                     <button class="filter-btn" id="filter-showcase">
                         <span class="material-icons" style="color: #f472b6;">auto_awesome</span> <span class="filter-text">Showcase</span>

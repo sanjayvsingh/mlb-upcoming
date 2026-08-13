@@ -103,6 +103,9 @@ let standingsData = null; // Store raw standings for record and rank
 let gamesData = { today: [], tomorrow: [], dayafter: [] };
 let activeTab = 'today';
 let filters = { bothUnseen: false, featured: false, electric: false, funGames: false, showcase: false };
+// Once 80%+ of teams have been seen, "Both Teams Unseen" games become rare-to-nonexistent,
+// so the filter/card broadens in place to "Unseen Teams" (at least one team unseen) instead.
+let unseenModeExpanded = false;
 let hotHitters = new Map();     // team nickname -> [{name, stat}]
 let milestoneWatch = new Map(); // team nickname -> [{name, description}]
 let cachedCountry = null;       // Result of geo-detection, shared across Canadian broadcaster fetches
@@ -114,6 +117,9 @@ const dom = {
     metricPercent: document.getElementById('metric-percent'),
     metric3Day: document.getElementById('metric-3day'),
     metricBoth: document.getElementById('metric-both'),
+    metricBothLabel: document.getElementById('metric-both-label'),
+    metricBothSublabel: document.getElementById('metric-both-sublabel'),
+    filterUnseenText: document.getElementById('filter-unseen-text'),
     metricToday: document.getElementById('metric-today'),
     metricFuture: document.getElementById('metric-future'),
     gamesContainer: document.getElementById('games-container'),
@@ -801,15 +807,23 @@ function toggleTeamSeen(teamName) {
 function renderMetrics() {
     // Collect all games in 3-day
     const all = [...gamesData.today, ...gamesData.tomorrow, ...gamesData.dayafter];
-    
+
     const anyUnseenCount = all.filter(g => g.anyUnseen).length;
     const bothUnseenCount = all.filter(g => g.bothUnseen).length;
-    
+
+    const seenTeamsCount = 30 - allTeamsDetailed.filter(t => t.unseen).length;
+    unseenModeExpanded = (seenTeamsCount / 30) >= 0.8;
+
     dom.metric3Day.textContent = anyUnseenCount;
-    dom.metricBoth.textContent = bothUnseenCount;
-    
+    dom.metricBoth.textContent = unseenModeExpanded ? anyUnseenCount : bothUnseenCount;
+    if (dom.metricBothLabel) dom.metricBothLabel.textContent = unseenModeExpanded ? 'Unseen Teams' : 'Both Teams Unseen';
+    if (dom.metricBothSublabel) dom.metricBothSublabel.textContent = unseenModeExpanded ? 'games with an unseen team' : 'top priority matchups';
+    if (dom.filterUnseenText) dom.filterUnseenText.textContent = unseenModeExpanded ? 'Unseen Teams' : 'Both Teams Unseen';
+
     dom.metricToday.textContent = gamesData.today.length;
     dom.metricFuture.textContent = `${gamesData.tomorrow.length} tomorrow • ${gamesData.dayafter.length} day after`;
+
+    renderUpcomingLookAhead();
 }
 
 function renderTabs() {
@@ -838,7 +852,10 @@ function renderGames() {
     const filtered = list.filter(g => {
         if (g.date < oneHourAgo) return false;
         if (g.isBananaBall) return !filters.funGames && !filters.bothUnseen && !filters.featured && !filters.electric && !filters.showcase;
-        if (filters.bothUnseen && !g.bothUnseen) return false;
+        if (filters.bothUnseen) {
+            const matchesUnseenFilter = unseenModeExpanded ? g.anyUnseen : g.bothUnseen;
+            if (!matchesUnseenFilter) return false;
+        }
 
         // For featured filter, check if any broadcasters pass the preference filter
         if (filters.featured) {
@@ -905,7 +922,7 @@ function renderGames() {
             badgesHtml = [
                 `<div class="badge fun-badge" title="${escapeHTML(funTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">diamond</span>${escapeHTML(g.funScore)}</div>`,
                 g.isShowcase ? `<div class="badge showcase-badge" title="${escapeHTML(g.showcaseReason)}"><span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">auto_awesome</span>SHOWCASE</div>` : '',
-                g.bothUnseen ? `<div class="badge both-unseen-badge"><span class="material-icons" style="font-size: inherit; vertical-align: middle; margin-right: 4px;">star</span>BOTH UNSEEN</div>` : '',
+                (unseenModeExpanded ? g.anyUnseen : g.bothUnseen) ? `<div class="badge both-unseen-badge"><span class="material-icons" style="font-size: inherit; vertical-align: middle; margin-right: 4px;">star</span>${unseenModeExpanded ? 'UNSEEN' : 'BOTH UNSEEN'}</div>` : '',
                 g.anyElectric ? `<div class="badge electric-badge mobile-only"><span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">bolt</span>ELECTRIC SP</div>` : '',
                 g.hotHitterInfo.length > 0 ? `<div class="badge hot-hitter-badge" title="${escapeHTML(hotHitterTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">local_fire_department</span>HOT BATS</div>` : '',
                 g.milestoneInfo.length > 0 ? `<div class="badge milestone-badge" title="${escapeHTML(milestoneTooltip)}"><span class="material-icons" style="color: inherit; font-size: 14px; vertical-align: middle; margin-right: 2px;">emoji_events</span>MILESTONE</div>` : '',
@@ -1868,6 +1885,190 @@ function removeCustomStarter(id) {
     saveCustomElectricStarters(list);
     rebuildElectricIds();
     renderElectricModal();
+}
+
+// ============================================================
+// TAP-FRIENDLY TOOLTIPS (mobile)
+// Desktop keeps the native title="" hover tooltip untouched. Touch
+// devices don't surface title on tap, so this adds a tap-to-show /
+// tap-away-to-close bubble reusing the same title text, active only
+// on touch-primary devices.
+// ============================================================
+let activeTapTooltip = null;
+
+function isTouchPrimary() {
+    return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function showTapTooltip(trigger) {
+    const text = trigger.getAttribute('title');
+    if (!text) return;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'tap-tooltip-bubble';
+    bubble.textContent = text;
+    document.body.appendChild(bubble);
+
+    const rect = trigger.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+    let top = rect.top - bubbleRect.height - 10;
+    let arrowClass = 'arrow-bottom';
+    if (top < 8) {
+        top = rect.bottom + 10;
+        arrowClass = 'arrow-top';
+    }
+    let left = rect.left + (rect.width / 2) - (bubbleRect.width / 2);
+    left = Math.max(8, Math.min(left, window.innerWidth - bubbleRect.width - 8));
+
+    bubble.style.top = `${top}px`;
+    bubble.style.left = `${left}px`;
+    bubble.classList.add(arrowClass);
+
+    activeTapTooltip = { bubble, trigger };
+}
+
+function hideTapTooltip() {
+    if (activeTapTooltip) {
+        activeTapTooltip.bubble.remove();
+        activeTapTooltip = null;
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (!isTouchPrimary()) return;
+    const trigger = e.target.closest('[title]');
+
+    if (activeTapTooltip) {
+        const wasSameTrigger = activeTapTooltip.trigger === trigger;
+        hideTapTooltip();
+        if (wasSameTrigger) return;
+    }
+
+    if (trigger) showTapTooltip(trigger);
+});
+
+// ============================================================
+// UPCOMING MATCHUP LOOK-AHEAD
+// Shows a badge on the "Both Teams Unseen" / "Unseen Teams" card once
+// unseenModeExpanded is on (80%+ of teams seen — same trigger the card
+// and filter use to broaden). It fires a background search of the rest
+// of the season's schedule (not awaited, so it never delays initial
+// render) for games between two still-unseen teams, groups consecutive
+// games into a series, and re-renders the badge when the search resolves.
+// ============================================================
+let rawLookAheadGames = null;   // all official-team games in the search window, unfiltered by unseen status
+let lookAheadFetchPromise = null;
+
+function toNickname(fullName) {
+    return [...MLB_OFFICIAL_NAMES].find(n => fullName.includes(n)) || fullName;
+}
+
+function formatSeriesDateRange(startStr, endStr) {
+    const start = new Date(startStr + 'T12:00:00');
+    const startLabel = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (startStr === endStr) return startLabel;
+    const end = new Date(endStr + 'T12:00:00');
+    const endLabel = end.toLocaleDateString('en-US', { day: 'numeric' });
+    return `${startLabel}–${endLabel}`;
+}
+
+// Groups consecutive games between the same pair (same home team, <=2 days apart) into one series
+function groupIntoSeries(matches) {
+    const sorted = [...matches].sort((a, b) => a.date.localeCompare(b.date));
+    const series = [];
+    const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+    sorted.forEach(m => {
+        const last = series[series.length - 1];
+        const gapMs = last ? new Date(m.date) - new Date(last.endDate) : Infinity;
+        if (last && last.away === m.away && last.home === m.home && gapMs <= twoDaysMs) {
+            last.endDate = m.date;
+        } else {
+            series.push({ away: m.away, home: m.home, startDate: m.date, endDate: m.date });
+        }
+    });
+    return series;
+}
+
+async function fetchUpcomingLookAheadRaw() {
+    const today = getToday();
+    const start = new Date(today); start.setDate(start.getDate() + 3); // day after the 3-day window already checked
+    const end = new Date(today.getFullYear(), 9, 5); // Oct 5 — safely covers every regular-season finish
+    if (start >= end) return [];
+
+    const url = `${STATS_API_BASE}/schedule?sportId=1&startDate=${getLocalDateString(start)}&endDate=${getLocalDateString(end)}&gameType=R`;
+    const data = await fetchJSONWithCache(url, 24 * 60 * 60 * 1000); // 24h cache — the schedule rarely changes intraday
+
+    const games = [];
+    (data.dates || []).forEach(dateObj => {
+        dateObj.games.forEach(g => {
+            const away = g.teams.away.team.name;
+            const home = g.teams.home.team.name;
+            if (isOfficialMLBTeam(away) && isOfficialMLBTeam(home)) {
+                games.push({ date: dateObj.date, away, home });
+            }
+        });
+    });
+    return games;
+}
+
+// Fires the background search at most once per page load; safe to call on every render.
+function ensureLookAheadFetched() {
+    if (lookAheadFetchPromise) return;
+    lookAheadFetchPromise = fetchUpcomingLookAheadRaw()
+        .then(games => {
+            rawLookAheadGames = games;
+            renderMetrics(); // re-render once the search resolves, without blocking anything up front
+        })
+        .catch(e => {
+            console.error('Look-ahead schedule search failed:', e);
+            rawLookAheadGames = [];
+        });
+}
+
+// Recomputed from the cached raw games on every call so it stays correct
+// if the user toggles a team's seen status after the search resolves.
+function getUpcomingSeries() {
+    if (!rawLookAheadGames) return null;
+    const matches = rawLookAheadGames.filter(g => isTeamMatch(g.away) && isTeamMatch(g.home));
+    return groupIntoSeries(matches);
+}
+
+function renderUpcomingLookAhead() {
+    const card = dom.metricBoth.closest('.metric-card');
+    if (!card) return;
+
+    let badge = card.querySelector('.upcoming-badge');
+
+    // Same trigger as the card/filter's own "Unseen Teams" broadening — once both-teams-unseen
+    // games are scarce enough that the filter had to widen, this hints where the next one is.
+    if (!unseenModeExpanded) {
+        if (badge) badge.remove();
+        return;
+    }
+
+    ensureLookAheadFetched();
+
+    const series = getUpcomingSeries();
+    if (!series || series.length === 0) {
+        if (badge) badge.remove();
+        return;
+    }
+
+    // The card no longer reads "Both Teams Unseen: 0" in this mode, so the badge needs its
+    // own heading to explain what it's pointing at.
+    const tooltipText = 'Upcoming both-teams-unseen matchups:\n' + series.map(s => {
+        const awayCode = TEAM_ABBR[toNickname(s.away)] || s.away;
+        const homeCode = TEAM_ABBR[toNickname(s.home)] || s.home;
+        return `${awayCode} @ ${homeCode} — ${formatSeriesDateRange(s.startDate, s.endDate)}`;
+    }).join('\n');
+
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'upcoming-badge';
+        badge.innerHTML = '<span class="material-icons">event</span>';
+        card.appendChild(badge);
+    }
+    badge.setAttribute('title', tooltipText);
 }
 
 document.addEventListener('DOMContentLoaded', init);
